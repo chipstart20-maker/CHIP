@@ -155,7 +155,7 @@
     <a href="#/produto/iphone-16" class="mega__feature">
       <span class="tag tag--inline">Novo</span>
       <strong>iPhone 16</strong><small>Chegou na Leandro</small>
-      <img src="assets/img/iphone-16.webp" alt="">
+      <img src="assets/img/iphone-16.png" alt="">
     </a>`;
   $('#mega').addEventListener('click', e => { if (e.target.closest('a')) { const d = $('.nav-drop'); d.classList.add('closed'); setTimeout(() => d.classList.remove('closed'), 400); } });
 
@@ -385,7 +385,7 @@
             <p>Traga seu aparelho, avaliamos na hora e o valor entra como parte do pagamento do novo.</p>
             <a href="${waLink('Olá! Quero avaliar meu iPhone usado para troca.')}" target="_blank" rel="noopener" class="btn btn--light">Avaliar meu iPhone ${arrow}</a>
           </div>
-          <img class="promo__img" src="assets/img/iphone-15-pro.webp" alt="" loading="lazy">
+          <img class="promo__img" src="assets/img/iphone-15-pro.png" alt="" loading="lazy">
         </div>
       </section>
 
