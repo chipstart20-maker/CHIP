@@ -11,10 +11,10 @@ const STORE = {
 };
 
 const CATEGORIES = [
-  { slug: 'iphones', name: 'iPhones', img: 'assets/img/cat-iphones.jpg' },
-  { slug: 'fones', name: 'Fones', img: 'assets/img/cat-fones.jpg' },
-  { slug: 'carregadores', name: 'Carregadores', img: 'assets/img/cat-carregadores.jpg' },
-  { slug: 'capinhas', name: 'Capinhas', img: 'assets/img/cat-capinhas.jpg' },
+  { slug: 'iphones', name: 'iPhones', img: 'assets/img/iphone-15-pro.webp' },
+  { slug: 'fones', name: 'Fones', img: 'assets/img/fone-jbl.webp' },
+  { slug: 'carregadores', name: 'Carregadores', img: 'assets/img/carregador-30w.webp' },
+  { slug: 'capinhas', name: 'Capinhas', img: 'assets/img/capinha.webp' },
 ];
 
 // price = preço à vista · oldPrice = preço "de" (riscado, opcional) · isNew = aparece em Lançamentos
@@ -22,7 +22,7 @@ const CATEGORIES = [
 const PRODUCTS = [
   {
     id: 'iphone-15', name: 'iPhone 15', category: 'iphones', featured: true,
-    img: 'assets/img/iphone-15.jpg', price: 4299, oldPrice: 4999,
+    img: 'assets/img/iphone-15.webp', price: 4299, oldPrice: 4999,
     desc: 'Dynamic Island, câmera principal de 48 MP e conector USB‑C. Vidro colorido com acabamento fosco.',
     colors: [
       { name: 'Rosa', hex: '#f5cdd6' }, { name: 'Preto', hex: '#3a3a3c' },
@@ -34,7 +34,7 @@ const PRODUCTS = [
   },
   {
     id: 'iphone-16', name: 'iPhone 16', category: 'iphones', featured: true, badge: 'Novo',
-    img: 'assets/img/iphone-16.jpg', price: 5499, oldPrice: 5999, isNew: true,
+    img: 'assets/img/iphone-16.webp', price: 5499, oldPrice: 5999, isNew: true,
     desc: 'Chip A18, botão Controle da Câmera e bateria que acompanha o seu dia inteiro.',
     colors: [
       { name: 'Ultramarino', hex: '#3d6be0', back: '#6f84ec', frame: '#4f63d2' },
@@ -48,7 +48,7 @@ const PRODUCTS = [
   },
   {
     id: 'iphone-15-pro', name: 'iPhone 15 Pro', category: 'iphones', featured: 'desktop',
-    img: 'assets/img/cat-iphones.jpg', price: 6199, oldPrice: 6999,
+    img: 'assets/img/iphone-15-pro.webp', price: 6199, oldPrice: 6999,
     desc: 'Estrutura em titânio, chip A17 Pro e sistema de câmeras Pro.',
     colors: [
       { name: 'Titânio natural', hex: '#bdb6aa' }, { name: 'Titânio preto', hex: '#3b3b3d' },
@@ -59,21 +59,21 @@ const PRODUCTS = [
   },
   {
     id: 'fone-jbl', name: 'Fone JBL Bluetooth', category: 'fones', featured: 'desktop',
-    img: 'assets/img/cat-fones.jpg', price: 299, oldPrice: 399,
+    img: 'assets/img/fone-jbl.webp', price: 299, oldPrice: 399,
     desc: 'Fone sem fio com estojo de carregamento, som JBL e conexão Bluetooth estável.',
     colors: [{ name: 'Branco', hex: '#f4f4f4' }],
     specs: [['Conexão', 'Bluetooth'], ['Estojo', 'Com carregamento'], ['Uso', 'Chamadas e música']],
   },
   {
     id: 'carregador-30w', name: 'Carregador USB‑C 30W', category: 'carregadores',
-    img: 'assets/img/cat-carregadores.jpg', price: 149,
+    img: 'assets/img/carregador-30w.webp', price: 149,
     desc: 'Carregamento rápido para iPhone e acessórios USB‑C.',
     colors: [{ name: 'Branco', hex: '#f4f4f4' }],
     specs: [['Potência', '30W'], ['Saída', 'USB‑C'], ['Compatível', 'iPhone 8 ou superior']],
   },
   {
     id: 'capinha-transparente', name: 'Capinha Transparente', category: 'capinhas',
-    img: 'assets/img/cat-capinhas.jpg', price: 59, oldPrice: 79,
+    img: 'assets/img/capinha.webp', price: 59, oldPrice: 79,
     desc: 'Proteção anti-impacto que mostra a cor original do seu iPhone.',
     colors: [{ name: 'Transparente', hex: '#e9eef3' }],
     specs: [['Material', 'TPU flexível'], ['Proteção', 'Cantos reforçados'], ['Acabamento', 'Transparente']],
@@ -89,13 +89,20 @@ const HERO_SLIDES = [
   },
   {
     title: 'iPhone 16.<br>Chegou na<br>Leandro.', text: 'Em várias cores e capacidades.',
-    cta: 'Ver iPhone 16', href: '#/produto/iphone-16',
-    img: 'assets/img/iphone-16.jpg', bg: '#eeedfd', layout: 'side',
+    cta: 'Ver iPhone 16', href: '#/produto/iphone-16', layout: 'product',
+    bg: 'radial-gradient(90% 80% at 78% 70%, #b9c4ff 0%, #dfe3ff 38%, #f3f3fc 70%)', glow: '#8fa0ff',
+    // aparelhos dentro da metade direita do banner (em %): x = distância da direita, y = da base, h = altura
+    items: [{ img: 'assets/img/iphone-16.webp', x: -4, y: -5, h: 82, r: -6 }],
   },
   {
     title: 'Acessórios<br>que completam<br>seu iPhone.', text: 'Fones, carregadores e capinhas.',
-    cta: 'Ver acessórios', href: '#/categorias',
-    img: 'assets/img/cat-fones.jpg', bg: '#f4f4f6', layout: 'side',
+    cta: 'Ver acessórios', href: '#/acessorios', layout: 'product',
+    bg: 'radial-gradient(90% 80% at 75% 70%, #ffe1c7 0%, #fbeee4 40%, #f7f5f2 72%)', glow: '#ffb27a',
+    items: [
+      { img: 'assets/img/capinha.webp', x: 3, y: 22, h: 62, r: 12 },
+      { img: 'assets/img/carregador-30w.webp', x: 52, y: 10, h: 44, r: -10 },
+      { img: 'assets/img/fone-jbl.webp', x: 14, y: -2, h: 38, r: -4 },
+    ],
   },
 ];
 

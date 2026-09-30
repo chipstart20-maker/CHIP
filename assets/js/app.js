@@ -155,7 +155,7 @@
     <a href="#/produto/iphone-16" class="mega__feature">
       <span class="tag tag--inline">Novo</span>
       <strong>iPhone 16</strong><small>Chegou na Leandro</small>
-      <img src="assets/img/iphone-16.jpg" alt="">
+      <img src="assets/img/iphone-16.webp" alt="">
     </a>`;
   $('#mega').addEventListener('click', e => { if (e.target.closest('a')) { const d = $('.nav-drop'); d.classList.add('closed'); setTimeout(() => d.classList.remove('closed'), 400); } });
 
@@ -333,8 +333,10 @@
       <section class="hero" aria-roledescription="carrossel">
         <div class="hero__track" id="heroTrack">
           ${HERO_SLIDES.map((s, i) => `
-          <div class="slide slide--${s.layout}" style="--bg:${s.bg}" aria-label="${i + 1} de ${HERO_SLIDES.length}">
-            <div class="slide__media"><img class="slide__img" src="${s.img}"${s.srcset ? ` srcset="${s.srcset}" sizes="(min-width: 900px) 70vw, 100vw"` : ''} alt="" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}></div>
+          <div class="slide slide--${s.layout}" style="--bg:${s.bg};${s.glow ? `--glow:${s.glow}` : ''}" aria-label="${i + 1} de ${HERO_SLIDES.length}">
+            <div class="slide__media">${s.items
+              ? s.items.map((it, k) => `<img class="slide__item" src="${it.img}" alt="" style="right:${it.x}%;bottom:${it.y}%;height:${it.h}%;--r:${it.r}deg;--k:${k}">`).join('')
+              : `<img class="slide__img" src="${s.img}"${s.srcset ? ` srcset="${s.srcset}" sizes="(min-width: 900px) 70vw, 100vw"` : ''} alt="" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`}</div>
             <div class="slide__text">
               <h1>${s.title}</h1>
               <p>${s.text}</p>
@@ -383,7 +385,7 @@
             <p>Traga seu aparelho, avaliamos na hora e o valor entra como parte do pagamento do novo.</p>
             <a href="${waLink('Olá! Quero avaliar meu iPhone usado para troca.')}" target="_blank" rel="noopener" class="btn btn--light">Avaliar meu iPhone ${arrow}</a>
           </div>
-          <img class="promo__img" src="assets/img/promo-iphone.png" alt="" loading="lazy">
+          <img class="promo__img" src="assets/img/iphone-15-pro.webp" alt="" loading="lazy">
         </div>
       </section>
 
@@ -536,7 +538,6 @@
       idx = i;
       dots.forEach((d, j) => d.classList.toggle('on', j === i));
       slides.forEach((s, j) => s.classList.toggle('active', j === i));
-      document.documentElement.style.setProperty('--head-bg', HERO_SLIDES[i].bg);
     };
     const go = i => track.scrollTo({ left: slides[i].offsetLeft, behavior: reduced ? 'auto' : 'smooth' });
     set(0);
@@ -646,7 +647,6 @@
     app.innerHTML = (views[view] && view !== 'notfound' ? views[view] : views.notfound)(param && decodeURIComponent(param));
     app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
     document.body.dataset.view = view;
-    if (view !== 'home') document.documentElement.style.removeProperty('--head-bg');
     const prod = view === 'produto' && byId(param);
     const navKey = prod?.isNew || view === 'lancamentos' ? 'novidade' : view === 'categoria' || view === 'produto' ? 'categorias' : view;
     // item ativo na barra inferior
