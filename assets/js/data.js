@@ -4,7 +4,9 @@ const STORE = {
   whatsapp: '5500000000000', // DDI + DDD + número, só dígitos
   instagram: 'leandrocelulares',
   address: 'Rua Exemplo, 123 — Centro',
+  city: 'Sua cidade — UF',
   hours: 'Seg a Sáb, 9h às 19h',
+  installments: 12, // parcelas no cartão
 };
 
 const CATEGORIES = [
@@ -19,23 +21,25 @@ const PRODUCTS = [
   {
     id: 'iphone-15', name: 'iPhone 15', category: 'iphones', featured: true,
     img: 'assets/img/iphone-15.jpg', price: 4299,
-    desc: 'Dynamic Island, câmera de 48 MP e USB‑C. Design em vidro colorido com acabamento fosco.',
+    desc: 'Dynamic Island, câmera principal de 48 MP e conector USB‑C. Vidro colorido com acabamento fosco.',
     colors: [
       { name: 'Rosa', hex: '#f5cdd6' }, { name: 'Preto', hex: '#3a3a3c' },
       { name: 'Verde', hex: '#cfe3c8' }, { name: 'Amarelo', hex: '#f6ecb0' },
       { name: 'Azul', hex: '#c0d5ea' },
     ],
     storage: ['128 GB', '256 GB', '512 GB'],
+    specs: [['Tela', '6,1" Super Retina XDR'], ['Chip', 'A16 Bionic'], ['Câmera', '48 MP + 12 MP'], ['Conector', 'USB‑C']],
   },
   {
-    id: 'iphone-16', name: 'iPhone 16', category: 'iphones', featured: true,
+    id: 'iphone-16', name: 'iPhone 16', category: 'iphones', featured: true, badge: 'Novo',
     img: 'assets/img/iphone-16.jpg', price: 5499,
-    desc: 'Chip A18, botão de Controle da Câmera e bateria que dura o dia todo.',
+    desc: 'Chip A18, botão Controle da Câmera e bateria que acompanha o seu dia inteiro.',
     colors: [
       { name: 'Ultramarino', hex: '#3d6be0' }, { name: 'Rosa', hex: '#e184b6' },
       { name: 'Preto', hex: '#3a3a3c' }, { name: 'Branco', hex: '#f4f4f4' },
     ],
     storage: ['128 GB', '256 GB', '512 GB'],
+    specs: [['Tela', '6,1" Super Retina XDR'], ['Chip', 'A18'], ['Câmera', '48 MP Fusion + 12 MP'], ['Conector', 'USB‑C']],
   },
   {
     id: 'iphone-15-pro', name: 'iPhone 15 Pro', category: 'iphones', featured: 'desktop',
@@ -46,24 +50,28 @@ const PRODUCTS = [
       { name: 'Titânio branco', hex: '#ecebe7' }, { name: 'Titânio azul', hex: '#3f4a5c' },
     ],
     storage: ['128 GB', '256 GB', '512 GB', '1 TB'],
+    specs: [['Tela', '6,1" ProMotion'], ['Chip', 'A17 Pro'], ['Câmera', '48 MP + ultra-angular + teleobjetiva'], ['Estrutura', 'Titânio']],
   },
   {
     id: 'fone-jbl', name: 'Fone JBL Bluetooth', category: 'fones', featured: 'desktop',
     img: 'assets/img/cat-fones.jpg', price: 299,
     desc: 'Fone sem fio com estojo de carregamento, som JBL e conexão Bluetooth estável.',
     colors: [{ name: 'Branco', hex: '#f4f4f4' }],
+    specs: [['Conexão', 'Bluetooth'], ['Estojo', 'Com carregamento'], ['Uso', 'Chamadas e música']],
   },
   {
     id: 'carregador-30w', name: 'Carregador USB‑C 30W', category: 'carregadores',
     img: 'assets/img/cat-carregadores.jpg', price: 149,
     desc: 'Carregamento rápido para iPhone e acessórios USB‑C.',
     colors: [{ name: 'Branco', hex: '#f4f4f4' }],
+    specs: [['Potência', '30W'], ['Saída', 'USB‑C'], ['Compatível', 'iPhone 8 ou superior']],
   },
   {
     id: 'capinha-transparente', name: 'Capinha Transparente', category: 'capinhas',
     img: 'assets/img/cat-capinhas.jpg', price: 59,
-    desc: 'Proteção antiimpacto que mostra a cor original do seu iPhone.',
+    desc: 'Proteção anti-impacto que mostra a cor original do seu iPhone.',
     colors: [{ name: 'Transparente', hex: '#e9eef3' }],
+    specs: [['Material', 'TPU flexível'], ['Proteção', 'Cantos reforçados'], ['Acabamento', 'Transparente']],
   },
 ];
 
@@ -71,7 +79,8 @@ const HERO_SLIDES = [
   {
     title: 'Tudo começa<br>com um novo<br>iPhone.', text: 'Encontre o seu na Leandro.',
     cta: 'Explorar iPhones', href: '#/categoria/iphones',
-    img: 'assets/img/hero-iphone.jpg', bg: '#e4e8f3', layout: 'full',
+    img: 'assets/img/hero-iphone.jpg', srcset: 'assets/img/hero-iphone.jpg 1080w, assets/img/hero-iphone-hd.jpg 1920w',
+    bg: '#e4e8f3', layout: 'full',
   },
   {
     title: 'iPhone 16.<br>Chegou na<br>Leandro.', text: 'Em várias cores e capacidades.',
@@ -81,6 +90,14 @@ const HERO_SLIDES = [
   {
     title: 'Acessórios<br>que completam<br>seu iPhone.', text: 'Fones, carregadores e capinhas.',
     cta: 'Ver acessórios', href: '#/categorias',
-    img: 'assets/img/cat-fones.jpg', bg: '#ffffff', layout: 'side',
+    img: 'assets/img/cat-fones.jpg', bg: '#f4f4f6', layout: 'side',
   },
+];
+
+// Diferenciais exibidos na home e na página do produto
+const PERKS = [
+  { icon: 'shield', title: 'Garantia', text: 'Aparelhos com garantia e nota fiscal' },
+  { icon: 'card', title: `Até ${STORE.installments}x no cartão`, text: 'Ou desconto no Pix' },
+  { icon: 'swap', title: 'Aceitamos seu usado', text: 'Avaliação na hora para troca' },
+  { icon: 'truck', title: 'Entrega ou retirada', text: 'Receba rápido ou retire na loja' },
 ];
