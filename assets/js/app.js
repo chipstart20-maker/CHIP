@@ -74,6 +74,34 @@
     if (e.target.closest('[data-close-link]')) closeAll();
   });
 
+  /* ---------- Favoritos ---------- */
+  let favs = (() => { try { return JSON.parse(localStorage.getItem('lc-favs')) || []; } catch { return []; } })().filter(byId);
+  const isFav = id => favs.includes(id);
+  function toggleFav(id) {
+    favs = isFav(id) ? favs.filter(x => x !== id) : [...favs, id];
+    try { localStorage.setItem('lc-favs', JSON.stringify(favs)); } catch {}
+    $$(`[data-fav="${id}"]`).forEach(b => { b.classList.toggle('on', isFav(id)); b.setAttribute('aria-pressed', isFav(id)); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); });
+    if (isFav(id)) toast(`${icon('heart')} Salvo nos favoritos`);
+    renderFavs();
+  }
+  function renderFavs() {
+    $('#favCount').textContent = favs.length;
+    $('#favCount').classList.toggle('show', favs.length > 0);
+    $('#favBody').innerHTML = favs.length ? `<ul class="cart__list">${favs.map(id => { const p = byId(id); return `
+      <li class="cart__item">
+        <a href="#/produto/${p.id}" class="cart__thumb" data-close-link><img src="${p.img}" alt=""></a>
+        <div class="cart__info"><strong>${p.name}</strong><small>${brl(p.price)} à vista</small>
+          <div class="cart__row"><a href="#/produto/${p.id}" class="btn btn--sm" data-close-link>Comprar ${arrow}</a></div></div>
+        <button class="icon-btn cart__remove" data-fav="${p.id}" aria-label="Remover dos favoritos">${icon('x')}</button>
+      </li>`; }).join('')}</ul>`
+      : `<div class="empty"><div class="empty__icon">${icon('heart')}</div><p><strong>Nenhum favorito ainda</strong><br>Toque no ♥ dos produtos para salvar aqui.</p><a href="#/ofertas" class="btn" data-close-link>Ver ofertas ${arrow}</a></div>`;
+  }
+  document.addEventListener('click', e => {
+    const f = e.target.closest('[data-fav]'); if (!f) return;
+    e.preventDefault(); toggleFav(f.dataset.fav);
+  });
+  $('#favBody').addEventListener('click', e => e.target.closest('[data-close-link]') && closeAll());
+
   function bump() { const b = $('#cartBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
   let toastT;
   function toast(html) { const t = $('#toast'); t.innerHTML = html; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2000); }
@@ -92,6 +120,8 @@
   }
   $('#menuBtn').onclick = () => { const on = !document.body.classList.contains('menu-open'); closeAll(); setMenu(on); };
   $('#cartBtn').onclick = () => open($('#cartDrawer'));
+  $('#favBtn').onclick = () => open($('#favDrawer'));
+  $('#navMenu').onclick = () => $('#menuBtn').click();
   $('#searchBtn').onclick = () => { open($('#search')); setTimeout(() => $('#searchInput').focus(), 150); doSearch($('#searchInput').value); };
   overlay.onclick = closeAll;
   $$('[data-close]').forEach(b => b.onclick = closeAll);
@@ -106,7 +136,8 @@
     <div class="menu__links">
       <a href="#/" style="--d:5">Início ${arrow}</a>
       <a href="#/categorias" style="--d:6">Todos os produtos ${arrow}</a>
-      <a href="#/produto/iphone-16" style="--d:7">Lançamentos <span class="tag tag--inline">Novo</span>${arrow}</a>
+      <a href="#/lancamentos" style="--d:7">Lançamentos <span class="tag tag--inline">Novo</span>${arrow}</a>
+      <a href="#/ofertas" style="--d:8">Ofertas ${arrow}</a>
       <a href="#/contato" style="--d:8">Contato e endereço ${arrow}</a>
     </div>
     <div class="menu__cta" style="--d:9">
@@ -149,15 +180,51 @@
       `<button class="swatch${sel === i ? ' on' : ''}" style="--c:${c.hex}" data-p="${p.id}" data-i="${i}" role="radio" aria-checked="${sel === i}" aria-label="${c.name}" title="${c.name}"></button>`).join('')}</div>`;
   };
 
-  const card = (p, extra = '') => `
+  const off = p => p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+  const favBtn = (p, cls = '') => `<button class="fav ${cls}${isFav(p.id) ? ' on' : ''}" data-fav="${p.id}" aria-pressed="${isFav(p.id)}" aria-label="Favoritar ${p.name}">${icon('heart')}</button>`;
+
+  const card = (p, extra = '') => {
+    const ci = pickedColor[p.id] ?? 0;
+    return `
     <article class="card${extra}">
-      ${p.badge ? `<span class="tag">${p.badge}</span>` : ''}
-      <a href="#/produto/${p.id}" class="card__img" aria-label="${p.name}"><img src="${p.img}" alt="${p.name}" loading="lazy"></a>
+      ${p.oldPrice ? `<p class="card__off">Até ${brl(p.oldPrice - p.price).replace(',00', '')} OFF</p>` : p.badge ? `<p class="card__off card__off--new">${p.badge}</p>` : '<p class="card__off card__off--empty">&nbsp;</p>'}
+      ${favBtn(p, 'card__fav')}
       <h3><a href="#/produto/${p.id}">${p.name}</a></h3>
-      ${p.colors.length > 1 ? swatches(p) : '<div class="swatches-gap"></div>'}
-      <p class="card__price"><span>a partir de</span> ${brl(p.price)}</p>
-      <a href="#/produto/${p.id}" class="btn btn--sm">Ver produto ${arrow}</a>
+      <a href="#/produto/${p.id}" class="card__img" aria-label="${p.name}"><img src="${p.img}" alt="${p.name}" loading="lazy"></a>
+      <p class="card__color" data-color-label="${p.id}">${p.colors[ci].name}</p>
+      ${swatches(p, 'swatches--sq', 0)}
+      <div class="card__prices">
+        ${p.oldPrice ? `<p class="card__old"><s>${brl(p.oldPrice)}</s><b class="pct">-${off(p)}%</b></p>` : '<p class="card__old">&nbsp;</p>'}
+        <p class="card__price"><strong>${brl(p.price)}</strong> à vista</p>
+        <p class="card__parc">ou em até ${parcel(p)}</p>
+      </div>
+      <a href="#/produto/${p.id}" class="btn btn--block card__buy">Comprar</a>
     </article>`;
+  };
+
+  // card grande do carrossel de ofertas
+  const offerCard = (o, i) => {
+    const p = byId(o.id); if (!p) return '';
+    const [inst, cents] = (p.price / STORE.installments).toFixed(2).split('.');
+    return `
+    <article class="offer" style="--g1:${o.glow[0]};--g2:${o.glow[1]}" data-i="${i}">
+      <h3 class="offer__title">${o.title}</h3>
+      <p class="offer__sub">${o.sub}</p>
+      <a href="#/produto/${p.id}" class="offer__media" aria-label="${p.name}"><span class="offer__glow"></span><img src="${p.img}" alt="${p.name}" loading="lazy"></a>
+      ${favBtn(p, 'offer__fav')}
+      <div class="offer__foot">
+        <div class="offer__price">
+          <span class="offer__name">${p.name}${p.oldPrice ? ` <b class="pct">-${off(p)}%</b>` : ''}</span>
+          <span class="offer__inst"><small>${STORE.installments}x<br>R$</small><strong>${Number(inst).toLocaleString('pt-BR')}</strong><sup>,${cents}</sup></span>
+          <span class="offer__total">ou ${brl(p.price)} à vista</span>
+        </div>
+        <div class="offer__cta">
+          <span class="offer__coupon">${STORE.pixNote}</span>
+          <a href="#/produto/${p.id}" class="btn btn--block">Comprar</a>
+        </div>
+      </div>
+    </article>`;
+  };
 
   const mini = p => `
     <a href="#/produto/${p.id}" class="mini">
@@ -228,6 +295,7 @@
     pickedColor[s.dataset.p] = +s.dataset.i;
     $$(`.swatch[data-p="${s.dataset.p}"]`).forEach(b => { const on = +b.dataset.i === +s.dataset.i; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
     const lbl = $('#colorName'); if (lbl) lbl.textContent = byId(s.dataset.p).colors[+s.dataset.i].name;
+    $$(`[data-color-label="${s.dataset.p}"]`).forEach(l => l.textContent = byId(s.dataset.p).colors[+s.dataset.i].name);
   });
 
   /* ---------- Rodapé ---------- */
@@ -282,6 +350,12 @@
         ${categoriesRow()}
       </section>
 
+      <section class="section offers-sec reveal">
+        <div class="wrap section__head"><h2 class="title">Ofertas da semana</h2><a href="#/ofertas" class="link">Ver todas ${arrow}</a></div>
+        <div class="offers" id="offers">${OFFERS.map(offerCard).join('')}</div>
+        <div class="pager" id="offersPager">${OFFERS.map((_, i) => `<button aria-label="Oferta ${i + 1}" data-i="${i}"${i ? '' : ' class="on"'}></button>`).join('')}</div>
+      </section>
+
       <section class="section wrap reveal">
         <h2 class="title">Destaques da loja</h2>
         <div class="grid">${PRODUCTS.filter(p => p.featured).map(p => card(p, p.featured === 'desktop' ? ' only-desktop' : '')).join('')}</div>
@@ -334,6 +408,36 @@
         </div>
       </section>`;
     },
+    ofertas() {
+      const list = PRODUCTS.filter(p => p.oldPrice).sort((a, b) => off(b) - off(a));
+      return `
+      <section class="section wrap page">
+        <span class="eyebrow">Preços especiais</span>
+        <h1 class="title title--xl">Ofertas</h1>
+        <p class="lead">Economize em iPhones e acessórios selecionados.</p>
+        <div class="grid">${list.map(p => card(p)).join('')}</div>
+      </section>`;
+    },
+    acessorios() {
+      const list = PRODUCTS.filter(p => p.category !== 'iphones');
+      return `
+      <section class="section wrap page">
+        <h1 class="title title--xl">Acessórios</h1>
+        <div class="chips chips--scroll">${CATEGORIES.filter(c => c.slug !== 'iphones').map(x => `<a href="#/categoria/${x.slug}" class="chip">${x.name}</a>`).join('')}</div>
+        <div class="grid">${list.map(p => card(p)).join('')}</div>
+      </section>`;
+    },
+    lancamentos() {
+      const list = PRODUCTS.filter(p => p.isNew);
+      return `
+      <section class="section wrap page">
+        <span class="eyebrow">Novidades</span>
+        <h1 class="title title--xl">Lançamentos</h1>
+        <p class="lead">Os modelos mais recentes que chegaram na Leandro.</p>
+        <div class="grid">${list.map(p => card(p)).join('')}</div>
+      </section>
+      ${show3d()}`;
+    },
     categorias() {
       return `
       <section class="section wrap page">
@@ -373,10 +477,11 @@
             <div class="view-toggle" role="tablist"><button class="on" data-view="photo" role="tab">Foto</button><button data-view="3d" role="tab"><b>3D</b> Girar</button><span class="view-toggle__pill"></span></div>` : ''}
           </div>
           <div class="product__info">
-            <h1>${p.name}</h1>
+            <div class="product__title"><h1>${p.name}</h1>${favBtn(p, 'fav--lg')}</div>
             <p class="product__desc">${p.desc}</p>
             <div class="price-box">
-              <p class="product__price">${brl(p.price)}</p>
+              ${p.oldPrice ? `<p class="card__old"><s>${brl(p.oldPrice)}</s><b class="pct">-${off(p)}%</b></p>` : ''}
+              <p class="product__price">${brl(p.price)} <small>à vista</small></p>
               <p class="product__install">ou ${parcel(p)} no cartão</p>
             </div>
             <div class="opt"><span class="opt__label">Cor: <b id="colorName">${p.colors[ci].name}</b></span>${swatches(p, 'swatches--lg', 0)}</div>
@@ -444,6 +549,17 @@
     };
     track.addEventListener('pointerdown', restart);
     restart();
+  }
+
+  function initOffers() {
+    const track = $('#offers'); if (!track) return;
+    const cards = $$('.offer', track), dots = $$('#offersPager button');
+    const current = () => { const c = track.scrollLeft + track.clientWidth / 2; let best = 0, d = 1e9;
+      cards.forEach((el, i) => { const m = Math.abs(el.offsetLeft + el.offsetWidth / 2 - c); if (m < d) { d = m; best = i; } }); return best; };
+    const set = () => { const i = current(); dots.forEach((d, j) => d.classList.toggle('on', j === i)); cards.forEach((c, j) => c.classList.toggle('active', j === i)); };
+    track.addEventListener('scroll', () => requestAnimationFrame(set), { passive: true });
+    dots.forEach(d => d.onclick = () => { const c = cards[+d.dataset.i]; track.scrollTo({ left: c.offsetLeft - (track.clientWidth - c.offsetWidth) / 2, behavior: 'smooth' }); });
+    set();
   }
 
   function initProduct(id) {
@@ -531,13 +647,18 @@
     app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
     document.body.dataset.view = view;
     if (view !== 'home') document.documentElement.style.removeProperty('--head-bg');
-    const navKey = view === 'produto' && param === 'iphone-16' ? 'novidade' : view === 'categoria' || view === 'produto' ? 'categorias' : view;
-    $$('[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === navKey || (navKey === 'novidade' && a.dataset.nav === 'categorias' && !!a.closest('.bottom-nav'))));
+    const prod = view === 'produto' && byId(param);
+    const navKey = prod?.isNew || view === 'lancamentos' ? 'novidade' : view === 'categoria' || view === 'produto' ? 'categorias' : view;
+    // item ativo na barra inferior
+    const bottomKey = view === 'categoria' ? (param === 'iphones' ? 'iphones' : 'acessorios') : prod ? (prod.category === 'iphones' ? 'iphones' : 'acessorios') : view;
+    $$('.header__nav [data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === navKey));
+    $$('.bottom-nav [data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === bottomKey));
     const p = view === 'produto' && byId(param);
     document.title = p ? `${p.name} — ${STORE.name}` : `${STORE.name} — iPhones e acessórios`;
     window.scrollTo({ top: 0, behavior: 'auto' });
     $('#header').classList.remove('hide');
-    if (view === 'home') { initHero(); watch3d($('#stage3d'), P3D, 0); }
+    if (view === 'home') { initHero(); initOffers(); }
+    if ($('#stage3d')) watch3d($('#stage3d'), P3D, 0);
     if (view === 'produto') initProduct(param);
     initReveal();
     initTilt();
@@ -550,6 +671,8 @@
   function onScroll() {
     const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
     header.classList.toggle('scrolled', y > 8);
+    document.body.classList.toggle('show-top', y > innerHeight * 1.2);
+    if (y > 40 && header.classList.contains('promo-open')) { header.classList.remove('promo-open'); $('#promoBtn').setAttribute('aria-expanded', false); }
     // esconde ao rolar para baixo, volta ao rolar para cima
     if (!document.body.classList.contains('lock')) {
       if (y > 140 && y - lastY > 6) header.classList.add('hide');
@@ -566,7 +689,13 @@
   window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
 
   // barra de avisos girando
-  $('#topbar').innerHTML = ANNOUNCEMENTS.map((m, i) => `<span class="topbar__item${i ? '' : ' on'}">${icon(m.icon)}${m.text}</span>`).join('');
+  $('#topbar').innerHTML = ANNOUNCEMENTS.map((m, i) => `<span class="topbar__item${i ? '' : ' on'}">${m.text}</span>`).join('');
+  $('#promoPanel').innerHTML = `<div class="promobar__list">${ANNOUNCEMENTS.map(m => `<div class="promobar__row"><span class="perk__icon">${icon(m.icon)}</span><span><strong>${m.text}</strong><small>${m.detail}</small></span></div>`).join('')}</div>`;
+  $('#promoBtn').onclick = () => {
+    const on = !header.classList.contains('promo-open');
+    header.classList.toggle('promo-open', on);
+    $('#promoBtn').setAttribute('aria-expanded', on);
+  };
   if (!reduced && ANNOUNCEMENTS.length > 1) {
     let ai = 0;
     setInterval(() => {
@@ -579,11 +708,22 @@
     }, 3800);
   }
 
+  // voltar ao topo
+  $('#topFab').onclick = () => scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+
+  // faixa de oferta
+  const deal = $('#deal');
+  let dealClosed = false; try { dealClosed = sessionStorage.getItem('lc-deal') === '1'; } catch {}
+  $('#dealText').textContent = DEAL.text; $('#dealCta').textContent = DEAL.cta; $('#dealCta').href = waLink(DEAL.message);
+  $('#dealClose').onclick = () => { deal.classList.remove('show'); document.body.classList.remove('has-deal'); try { sessionStorage.setItem('lc-deal', '1'); } catch {} dealClosed = true; };
+  if (!dealClosed) setTimeout(() => { if (!dealClosed) { deal.classList.add('show'); document.body.classList.add('has-deal'); } }, 2500);
+
   $('#searchPill').onclick = () => $('#searchBtn').click();
   $('#headerWa').href = waLink('Olá! Vim pelo site da Leandro Celulares.');
   document.addEventListener('keydown', e => {
     if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); $('#searchBtn').click(); }
   });
   renderCart();
+  renderFavs();
   route();
 })();

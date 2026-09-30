@@ -7,6 +7,7 @@ const STORE = {
   city: 'Sua cidade — UF',
   hours: 'Seg a Sáb, 9h às 19h',
   installments: 12, // parcelas no cartão
+  pixNote: 'Desconto especial no Pix', // aparece nos cards de oferta
 };
 
 const CATEGORIES = [
@@ -16,11 +17,12 @@ const CATEGORIES = [
   { slug: 'capinhas', name: 'Capinhas', img: 'assets/img/cat-capinhas.jpg' },
 ];
 
+// price = preço à vista · oldPrice = preço "de" (riscado, opcional) · isNew = aparece em Lançamentos
 // featured: true = aparece em "Destaques" sempre; 'desktop' = só em telas grandes
 const PRODUCTS = [
   {
     id: 'iphone-15', name: 'iPhone 15', category: 'iphones', featured: true,
-    img: 'assets/img/iphone-15.jpg', price: 4299,
+    img: 'assets/img/iphone-15.jpg', price: 4299, oldPrice: 4999,
     desc: 'Dynamic Island, câmera principal de 48 MP e conector USB‑C. Vidro colorido com acabamento fosco.',
     colors: [
       { name: 'Rosa', hex: '#f5cdd6' }, { name: 'Preto', hex: '#3a3a3c' },
@@ -32,7 +34,7 @@ const PRODUCTS = [
   },
   {
     id: 'iphone-16', name: 'iPhone 16', category: 'iphones', featured: true, badge: 'Novo',
-    img: 'assets/img/iphone-16.jpg', price: 5499,
+    img: 'assets/img/iphone-16.jpg', price: 5499, oldPrice: 5999, isNew: true,
     desc: 'Chip A18, botão Controle da Câmera e bateria que acompanha o seu dia inteiro.',
     colors: [
       { name: 'Ultramarino', hex: '#3d6be0', back: '#6f84ec', frame: '#4f63d2' },
@@ -46,7 +48,7 @@ const PRODUCTS = [
   },
   {
     id: 'iphone-15-pro', name: 'iPhone 15 Pro', category: 'iphones', featured: 'desktop',
-    img: 'assets/img/cat-iphones.jpg', price: 6199,
+    img: 'assets/img/cat-iphones.jpg', price: 6199, oldPrice: 6999,
     desc: 'Estrutura em titânio, chip A17 Pro e sistema de câmeras Pro.',
     colors: [
       { name: 'Titânio natural', hex: '#bdb6aa' }, { name: 'Titânio preto', hex: '#3b3b3d' },
@@ -57,7 +59,7 @@ const PRODUCTS = [
   },
   {
     id: 'fone-jbl', name: 'Fone JBL Bluetooth', category: 'fones', featured: 'desktop',
-    img: 'assets/img/cat-fones.jpg', price: 299,
+    img: 'assets/img/cat-fones.jpg', price: 299, oldPrice: 399,
     desc: 'Fone sem fio com estojo de carregamento, som JBL e conexão Bluetooth estável.',
     colors: [{ name: 'Branco', hex: '#f4f4f4' }],
     specs: [['Conexão', 'Bluetooth'], ['Estojo', 'Com carregamento'], ['Uso', 'Chamadas e música']],
@@ -71,7 +73,7 @@ const PRODUCTS = [
   },
   {
     id: 'capinha-transparente', name: 'Capinha Transparente', category: 'capinhas',
-    img: 'assets/img/cat-capinhas.jpg', price: 59,
+    img: 'assets/img/cat-capinhas.jpg', price: 59, oldPrice: 79,
     desc: 'Proteção anti-impacto que mostra a cor original do seu iPhone.',
     colors: [{ name: 'Transparente', hex: '#e9eef3' }],
     specs: [['Material', 'TPU flexível'], ['Proteção', 'Cantos reforçados'], ['Acabamento', 'Transparente']],
@@ -107,10 +109,21 @@ const PERKS = [
 
 // Avisos que giram na barra preta do topo
 const ANNOUNCEMENTS = [
-  { icon: 'card', text: `Parcele em até ${STORE.installments}x no cartão` },
-  { icon: 'swap', text: 'Aceitamos seu iPhone usado na troca' },
-  { icon: 'wa', text: 'Atendimento rápido pelo WhatsApp' },
+  { icon: 'card', text: `Parcelamento em até ${STORE.installments}x no cartão`, detail: 'Crédito, débito e Pix. Consulte as condições no atendimento.' },
+  { icon: 'swap', text: 'Aceitamos seu iPhone usado na troca', detail: 'Avaliamos na hora e o valor entra no pagamento do novo.' },
+  { icon: 'wa', text: 'Atendimento rápido pelo WhatsApp', detail: 'Tire dúvidas e consulte estoque sem sair de casa.' },
 ];
+
+// Carrossel de ofertas da home (cards com preço)
+const OFFERS = [
+  { id: 'iphone-16', title: 'O iPhone mais novo<br>chegou na Leandro', sub: 'Chip A18 e botão Controle da Câmera', glow: ['#dfe4ff', '#9fb0f7'] },
+  { id: 'iphone-15', title: 'Cor, câmera de 48 MP<br>e Dynamic Island', sub: 'O iPhone 15 em 5 cores', glow: ['#ffe3ea', '#f5b7c7'] },
+  { id: 'iphone-15-pro', title: 'Titânio e chip<br>A17 Pro', sub: 'Desempenho de nível Pro', glow: ['#efeae2', '#cfc5b6'] },
+  { id: 'fone-jbl', title: 'Som JBL<br>sem fios', sub: 'Estojo com carregamento', glow: ['#eef1f6', '#cdd6e4'] },
+];
+
+// Faixa de oferta que aparece em cima da barra inferior (pode ser fechada)
+const DEAL = { text: 'Troque seu usado e ganhe desconto', cta: 'Eu quero!', message: 'Olá! Quero avaliar meu iPhone usado para troca.' };
 
 // Faixa animada da home
 const MARQUEE = ['iPhones', 'Fones', 'Carregadores', 'Capinhas', 'Garantia', `Até ${STORE.installments}x`, 'Troca de usado'];
