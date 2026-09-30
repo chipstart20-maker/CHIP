@@ -36,13 +36,17 @@
   <header class="header" id="header">
     <div class="topbar" aria-live="off"><div class="topbar__track" id="topbar"></div></div>
     <div class="header__inner">
-      <button class="icon-btn burger" id="menuBtn" aria-label="Abrir menu"><span></span><span></span><span></span></button>
       <a href="#/" class="logo" aria-label="Leandro Celulares - início">
         <img src="assets/img/logo.png" alt="Leandro Celulares">
       </a>
       <nav class="header__nav" aria-label="Principal">
         <a href="#/" data-nav="home">Início</a>
-        <a href="#/categorias" data-nav="categorias">Categorias</a>
+        <div class="nav-drop">
+          <a href="#/categorias" data-nav="categorias" class="nav-drop__trigger" aria-haspopup="true">Categorias
+            <svg viewBox="0 0 24 24" class="chev"><path d="m6 9 6 6 6-6"/></svg></a>
+          <div class="mega" id="mega"></div>
+        </div>
+        <a href="#/produto/iphone-16" data-nav="novidade">Lançamentos</a>
         <a href="#/contato" data-nav="contato">Contato</a>
       </nav>
       <div class="header__actions">
@@ -58,6 +62,7 @@
           <svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
           <span class="badge" id="cartCount">0</span>
         </button>
+        <button class="icon-btn burger" id="menuBtn" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
       </div>
     </div>
     <span class="header__progress" id="progress"></span>
@@ -87,15 +92,10 @@
     </a>
   </nav>
 
-  <!-- Menu lateral -->
+  <!-- Menu (celular) em tela cheia -->
+  <nav class="menu" id="menu" aria-label="Menu" aria-hidden="true"><div class="menu__inner" id="menuLinks"></div></nav>
+
   <div class="overlay" id="overlay"></div>
-  <aside class="drawer drawer--left" id="menuDrawer" aria-label="Menu">
-    <div class="drawer__head">
-      <img src="assets/img/logo.png" alt="Leandro Celulares" class="drawer__logo">
-      <button class="icon-btn" data-close aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
-    </div>
-    <nav class="drawer__nav" id="menuLinks"></nav>
-  </aside>
 
   <!-- Sacola -->
   <aside class="drawer drawer--right" id="cartDrawer" aria-label="Sacola">

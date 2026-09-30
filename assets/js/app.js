@@ -81,22 +81,52 @@
   /* ---------- Drawers / busca ---------- */
   const overlay = $('#overlay');
   function open(el) { closeAll(); el.classList.add('open'); overlay.classList.add('show'); document.body.classList.add('lock'); }
-  function closeAll() { $$('.drawer.open, .search.open').forEach(d => d.classList.remove('open')); overlay.classList.remove('show'); document.body.classList.remove('lock'); }
-  $('#menuBtn').onclick = () => open($('#menuDrawer'));
+  function closeAll() { $$('.drawer.open, .search.open').forEach(d => d.classList.remove('open')); overlay.classList.remove('show'); setMenu(false); document.body.classList.remove('lock'); }
+  function setMenu(on) {
+    const btn = $('#menuBtn');
+    document.body.classList.toggle('menu-open', on);
+    btn.setAttribute('aria-expanded', on);
+    btn.setAttribute('aria-label', on ? 'Fechar menu' : 'Abrir menu');
+    $('#menu').setAttribute('aria-hidden', !on);
+    if (on) { document.body.classList.add('lock'); $('#header').classList.remove('hide'); }
+  }
+  $('#menuBtn').onclick = () => { const on = !document.body.classList.contains('menu-open'); closeAll(); setMenu(on); };
   $('#cartBtn').onclick = () => open($('#cartDrawer'));
   $('#searchBtn').onclick = () => { open($('#search')); setTimeout(() => $('#searchInput').focus(), 150); doSearch($('#searchInput').value); };
   overlay.onclick = closeAll;
   $$('[data-close]').forEach(b => b.onclick = closeAll);
   document.addEventListener('keydown', e => e.key === 'Escape' && closeAll());
 
+  // menu em tela cheia (celular)
   $('#menuLinks').innerHTML = `
-    <a href="#/">Início ${arrow}</a>
-    <span class="drawer__label">Categorias</span>
-    ${CATEGORIES.map(c => `<a href="#/categoria/${c.slug}"><img src="${c.img}" alt="">${c.name}${arrow}</a>`).join('')}
-    <span class="drawer__label">Atendimento</span>
-    <a href="#/contato">Contato e endereço ${arrow}</a>
-    <a href="${waLink('Olá! Vim pelo site.')}" target="_blank" rel="noopener" class="btn btn--block btn--wa drawer__wa">${icon('wa')} Falar no WhatsApp</a>`;
+    <span class="menu__label" style="--d:0">Categorias</span>
+    <div class="menu__cats">${CATEGORIES.map((c, i) => `
+      <a href="#/categoria/${c.slug}" class="menu__cat" style="--d:${i + 1}"><img src="${c.img}" alt=""><span>${c.name}</span>${arrow}</a>`).join('')}
+    </div>
+    <div class="menu__links">
+      <a href="#/" style="--d:5">Início ${arrow}</a>
+      <a href="#/categorias" style="--d:6">Todos os produtos ${arrow}</a>
+      <a href="#/produto/iphone-16" style="--d:7">Lançamentos <span class="tag tag--inline">Novo</span>${arrow}</a>
+      <a href="#/contato" style="--d:8">Contato e endereço ${arrow}</a>
+    </div>
+    <div class="menu__cta" style="--d:9">
+      <a href="${waLink('Olá! Vim pelo site.')}" target="_blank" rel="noopener" class="btn btn--block btn--wa">${icon('wa')} Falar no WhatsApp</a>
+      <a href="https://instagram.com/${STORE.instagram}" target="_blank" rel="noopener" class="btn btn--block btn--ghost">${icon('insta')} @${STORE.instagram}</a>
+    </div>
+    <p class="menu__info" style="--d:10">${icon('clock')} ${STORE.hours}<br>${icon('pin')} ${STORE.address}</p>`;
   $('#menuLinks').addEventListener('click', e => e.target.closest('a') && closeAll());
+
+  // mega menu (computador)
+  $('#mega').innerHTML = `
+    <div class="mega__cats">${CATEGORIES.map(c => `
+      <a href="#/categoria/${c.slug}" class="mega__cat"><span class="mega__img"><img src="${c.img}" alt=""></span><strong>${c.name}</strong><small>${(n => `${n} ${n === 1 ? 'produto' : 'produtos'}`)(PRODUCTS.filter(p => p.category === c.slug).length)}</small></a>`).join('')}
+    </div>
+    <a href="#/produto/iphone-16" class="mega__feature">
+      <span class="tag tag--inline">Novo</span>
+      <strong>iPhone 16</strong><small>Chegou na Leandro</small>
+      <img src="assets/img/iphone-16.jpg" alt="">
+    </a>`;
+  $('#mega').addEventListener('click', e => { if (e.target.closest('a')) { const d = $('.nav-drop'); d.classList.add('closed'); setTimeout(() => d.classList.remove('closed'), 400); } });
 
   const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   function doSearch(q) {
@@ -400,8 +430,8 @@
     app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
     document.body.dataset.view = view;
     if (view !== 'home') document.documentElement.style.removeProperty('--head-bg');
-    const navKey = view === 'categoria' || view === 'produto' ? 'categorias' : view;
-    $$('[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === navKey));
+    const navKey = view === 'produto' && param === 'iphone-16' ? 'novidade' : view === 'categoria' || view === 'produto' ? 'categorias' : view;
+    $$('[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === navKey || (navKey === 'novidade' && a.dataset.nav === 'categorias' && !!a.closest('.bottom-nav'))));
     const p = view === 'produto' && byId(param);
     document.title = p ? `${p.name} — ${STORE.name}` : `${STORE.name} — iPhones e acessórios`;
     window.scrollTo({ top: 0, behavior: 'auto' });
