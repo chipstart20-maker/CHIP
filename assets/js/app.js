@@ -138,8 +138,8 @@
     </a>`;
 
   const categoriesRow = () => `
-    <div class="cats">${CATEGORIES.map(c => `
-      <a href="#/categoria/${c.slug}" class="cat"><span class="cat__img"><img src="${c.img}" alt="" loading="lazy"></span><span>${c.name}</span></a>`).join('')}
+    <div class="cats">${CATEGORIES.map((c, i) => `
+      <a href="#/categoria/${c.slug}" class="cat" style="--i:${i}"><span class="cat__img"><img src="${c.img}" alt="" loading="lazy"></span><span class="cat__name">${c.name}</span></a>`).join('')}
     </div>`;
 
   const perks = (cls = '') => `
@@ -201,7 +201,7 @@
         <div class="dots" id="heroDots">${HERO_SLIDES.map((_, i) => `<button aria-label="Slide ${i + 1}" data-i="${i}"></button>`).join('')}</div>
       </section>
 
-      <section class="section wrap reveal">
+      <section class="section wrap">
         <h2 class="title">Encontre o que combina com você</h2>
         ${categoriesRow()}
       </section>
@@ -382,7 +382,7 @@
   }
 
   function initReveal() {
-    const els = $$('.reveal');
+    const els = $$('.reveal, .cats');
     if (reduced || !('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
@@ -405,13 +405,48 @@
     const p = view === 'produto' && byId(param);
     document.title = p ? `${p.name} — ${STORE.name}` : `${STORE.name} — iPhones e acessórios`;
     window.scrollTo({ top: 0, behavior: 'auto' });
+    $('#header').classList.remove('hide');
     if (view === 'home') initHero();
     if (view === 'produto') initProduct(param);
     initReveal();
   }
 
   window.addEventListener('hashchange', route);
-  window.addEventListener('scroll', () => $('#header').classList.toggle('scrolled', scrollY > 8), { passive: true });
+  /* ---------- Cabeçalho ---------- */
+  const header = $('#header'), progress = $('#progress');
+  let lastY = scrollY, ticking = false;
+  function onScroll() {
+    const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    header.classList.toggle('scrolled', y > 8);
+    // esconde ao rolar para baixo, volta ao rolar para cima
+    if (!document.body.classList.contains('lock')) {
+      if (y > 140 && y - lastY > 6) header.classList.add('hide');
+      else if (lastY - y > 6 || y < 140) header.classList.remove('hide');
+    }
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max) : 0})`;
+    lastY = y; ticking = false;
+  }
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+
+  // barra de avisos girando
+  $('#topbar').innerHTML = ANNOUNCEMENTS.map((m, i) => `<span class="topbar__item${i ? '' : ' on'}">${icon(m.icon)}${m.text}</span>`).join('');
+  if (!reduced && ANNOUNCEMENTS.length > 1) {
+    let ai = 0;
+    setInterval(() => {
+      const items = $$('.topbar__item');
+      items[ai].classList.replace('on', 'out');
+      const prev = items[ai];
+      setTimeout(() => prev.classList.remove('out'), 600);
+      ai = (ai + 1) % items.length;
+      items[ai].classList.add('on');
+    }, 3800);
+  }
+
+  $('#searchPill').onclick = () => $('#searchBtn').click();
+  $('#headerWa').href = waLink('Olá! Vim pelo site da Leandro Celulares.');
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); $('#searchBtn').click(); }
+  });
   renderCart();
   route();
 })();

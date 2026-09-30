@@ -101,3 +101,10 @@ const PERKS = [
   { icon: 'swap', title: 'Aceitamos seu usado', text: 'Avaliação na hora para troca' },
   { icon: 'truck', title: 'Entrega ou retirada', text: 'Receba rápido ou retire na loja' },
 ];
+
+// Avisos que giram na barra preta do topo
+const ANNOUNCEMENTS = [
+  { icon: 'card', text: `Parcele em até ${STORE.installments}x no cartão` },
+  { icon: 'swap', text: 'Aceitamos seu iPhone usado na troca' },
+  { icon: 'wa', text: 'Atendimento rápido pelo WhatsApp' },
+];
