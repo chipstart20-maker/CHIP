@@ -35,9 +35,12 @@ const PRODUCTS = [
     img: 'assets/img/iphone-16.jpg', price: 5499,
     desc: 'Chip A18, botão Controle da Câmera e bateria que acompanha o seu dia inteiro.',
     colors: [
-      { name: 'Ultramarino', hex: '#3d6be0' }, { name: 'Rosa', hex: '#e184b6' },
-      { name: 'Preto', hex: '#3a3a3c' }, { name: 'Branco', hex: '#f4f4f4' },
+      { name: 'Ultramarino', hex: '#3d6be0', back: '#6f84ec', frame: '#4f63d2' },
+      { name: 'Rosa', hex: '#e184b6', back: '#f2a9d0', frame: '#e27fb6' },
+      { name: 'Preto', hex: '#3a3a3c', back: '#3b3c41', frame: '#2c2d31' },
+      { name: 'Branco', hex: '#f4f4f4', back: '#f1f1ee', frame: '#d8d8d4' },
     ],
+    model3d: 'assets/img/screen-iphone16.jpg', // tela usada no iPhone em 3D
     storage: ['128 GB', '256 GB', '512 GB'],
     specs: [['Tela', '6,1" Super Retina XDR'], ['Chip', 'A18'], ['Câmera', '48 MP Fusion + 12 MP'], ['Conector', 'USB‑C']],
   },
@@ -108,3 +111,6 @@ const ANNOUNCEMENTS = [
   { icon: 'swap', text: 'Aceitamos seu iPhone usado na troca' },
   { icon: 'wa', text: 'Atendimento rápido pelo WhatsApp' },
 ];
+
+// Faixa animada da home
+const MARQUEE = ['iPhones', 'Fones', 'Carregadores', 'Capinhas', 'Garantia', `Até ${STORE.installments}x`, 'Troca de usado'];
